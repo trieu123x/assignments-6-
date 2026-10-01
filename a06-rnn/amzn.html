@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AMZN — RNN Lab</title>
+  <meta name="description" content="Dự báo lợi suất và biến động cổ phiếu Amazon bằng LSTM/GRU — chạy trong trình duyệt.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Cpath d='M7 20c3-9 6-9 9 0s6 9 9 0' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body data-page="amzn">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>RNN Lab <span class="muted">· Assignment 06</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Trang chủ <small>tổng quan</small></a>
+      <a href="churn.html">Churn <small>khách hàng rời bỏ</small></a>
+      <a href="amzn.html" aria-current="page">AMZN <small>lợi suất · biến động</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro">
+      <p>Hai mô hình cùng đọc 60 phiên gần nhất × 4 đặc trưng (lợi suất, biên độ, thân nến, khối lượng tương đối):
+        mô hình 1 dự báo <b>lợi suất phiên sau μ̂</b>, mô hình 2 dự báo <b>biến động 5 phiên tới σ̂</b>. Ghép lại thành
+        khoảng giá C<sub>t</sub>·exp(μ̂ ± k·σ̂), trong đó k là hệ số được hiệu chỉnh trên tập validation.</p>
+    </div>
+
+    <section class="kpis" id="kpis"><p class="muted">Đang tải dữ liệu và chạy mô hình…</p></section>
+
+    <div class="card mt">
+      <h2><span class="step">1</span> Giá đóng cửa và dự báo phiên kế tiếp
+        <span class="seg small" id="rangeSel" role="group" aria-label="Khoảng thời gian">
+          <button type="button" data-n="60">60 phiên</button><button type="button" data-n="250" class="on">1 năm</button><button type="button" data-n="0">từ 09/2017</button>
+        </span>
+      </h2>
+      <div class="chart-box tall"><canvas id="priceChart" aria-label="Giá đóng cửa và khoảng dự báo"></canvas></div>
+    </div>
+
+    <div class="grid2 mt">
+      <div class="card">
+        <h2><span class="step">2</span> Quay lại một ngày trong giai đoạn test</h2>
+        <label class="slider-row">Ngày t: <b id="tDate">—</b>
+          <input type="range" id="tSlider" min="0" max="1" step="1" value="0" aria-label="Chọn ngày">
+        </label>
+        <div id="tOut"></div>
+        <div class="chart-box short"><canvas id="winChart" aria-label="Cửa sổ 60 phiên"></canvas></div>
+        <p class="note muted">Mô hình chỉ thấy 60 phiên đến ngày t (đường xanh). Các ô bên trên so dự báo với giá trị thực
+          của phiên t+1 và của 5 phiên t+1…t+5.</p>
+      </div>
+      <div class="card">
+        <h2><span class="step">3</span> Khoảng 95% cho lợi suất trên toàn giai đoạn test</h2>
+        <div class="chart-box"><canvas id="bandChart" aria-label="Khoảng dự báo lợi suất"></canvas></div>
+        <p class="note" id="bandNote"></p>
+      </div>
+    </div>
+
+    <div class="card mt">
+      <h2><span class="step">4</span> Biến động 5 phiên tới: dự báo và thực tế (năm hoá)</h2>
+      <div class="chart-box tall"><canvas id="volChart" aria-label="Biến động dự báo và thực tế"></canvas></div>
+      <p class="note muted">HAR (Corsi, 2009) là mô hình đối chứng tuyến tính, dùng σ của 1, 5 và 22 phiên qua. Mô hình
+        hồi quy học được gần như cùng thông tin nhưng không vượt HAR một cách có ý nghĩa thống kê (mục 4.6).</p>
+    </div>
+
+    <div class="grid2 mt">
+      <div class="card">
+        <h2>Vì sao không dự báo "giá ngày mai"?</h2>
+        <div class="prose small">
+          <ul>
+            <li>Tự tương quan của lợi suất ngày gần 0 (ρ<sub>1</sub> = 0,005). Mô hình lợi suất tốt nhất chỉ đạt
+              R²<sub>oos</sub> ≈ 0 và dự báo co về quanh 0. Đây là kết quả trung thực, không phải lỗi huấn luyện.</li>
+            <li>Một LSTM học "giá ngày mai" từ giá hôm nay cho R² ≈ 0,99 trên đồ thị. Thực chất nó sao chép giá hôm nay
+              với độ trễ một phiên, và vẫn thua dự báo ngây thơ Ĉ<sub>t+1</sub> = C<sub>t</sub> (mục 4.5).</li>
+            <li>|lợi suất| thì tự tương quan mạnh: những cụm biến động lớn kéo dài nhiều tuần. Vì vậy độ rộng của khoảng
+              giá dự báo được, còn hướng đi của giá thì không.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Chỉ số trên tập test (2018-01 → 2022-03)</h2>
+        <div id="amznTable"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="wrap foot muted">
+    Dữ liệu: <a href="https://www.kaggle.com/datasets/varpit94/amazon-stock-data" target="_blank" rel="noopener">Amazon Stock Data (Kaggle)</a>,
+    15/05/1997 – 24/03/2022 (trước đợt chia tách 20:1 năm 2022). Không phải khuyến nghị đầu tư.
+    — suy luận: <code>rnn.js</code> · biểu đồ: Chart.js
+  </footer>
+
+  <script src="rnn.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

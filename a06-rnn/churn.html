@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Churn — RNN Lab</title>
+  <meta name="description" content="Dự đoán khách hàng rời bỏ ngân hàng bằng RNN, LSTM, GRU — chạy trong trình duyệt.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Cpath d='M7 20c3-9 6-9 9 0s6 9 9 0' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body data-page="churn">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>RNN Lab <span class="muted">· Assignment 06</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Trang chủ <small>tổng quan</small></a>
+      <a href="churn.html" aria-current="page">Churn <small>khách hàng rời bỏ</small></a>
+      <a href="amzn.html">AMZN <small>lợi suất · biến động</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro">
+      <p>Hồ sơ 11 cột được đọc như một <b>chuỗi 11 bước</b>. Mỗi bước gồm giá trị đã chuẩn hoá và mã one-hot cho biết
+        đó là cột nào. Ba mô hình RNN, LSTM, GRU chạy song song. Ngưỡng quyết định của từng mô hình là ngưỡng tối đa F1
+        trên tập validation.</p>
+    </div>
+    <div class="grid2">
+      <form class="card" id="chForm" autocomplete="off">
+        <h2><span class="step">1</span> Hồ sơ khách hàng</h2>
+        <div class="presets"><span class="label">Khách hàng mẫu từ tập test (nhãn thật trong ngoặc):</span><div id="chSamples" class="chips"></div></div>
+        <div class="form-grid">
+          <label>Quốc gia
+            <select name="Geography"><option>France</option><option>Germany</option><option>Spain</option></select>
+          </label>
+          <label>Giới tính
+            <select name="Gender"><option value="Female">Nữ</option><option value="Male">Nam</option></select>
+          </label>
+          <label>Tuổi <output data-for="Age"></output>
+            <input type="range" name="Age" min="18" max="92" step="1" value="42">
+          </label>
+          <label>Điểm tín dụng <output data-for="CreditScore"></output>
+            <input type="range" name="CreditScore" min="350" max="850" step="1" value="650">
+          </label>
+          <label>Số năm gắn bó <output data-for="Tenure"></output>
+            <input type="range" name="Tenure" min="0" max="10" step="1" value="5">
+          </label>
+          <label>Số sản phẩm <output data-for="NumOfProducts"></output>
+            <input type="range" name="NumOfProducts" min="1" max="4" step="1" value="1">
+          </label>
+          <label>Số dư (EUR) <output data-for="Balance"></output>
+            <input type="range" name="Balance" min="0" max="250000" step="500" value="100000">
+          </label>
+          <label>Thu nhập ước tính <output data-for="EstimatedSalary"></output>
+            <input type="range" name="EstimatedSalary" min="0" max="200000" step="500" value="100000">
+          </label>
+          <label class="check"><input type="checkbox" name="HasCrCard" checked> Có thẻ tín dụng</label>
+          <label class="check"><input type="checkbox" name="IsActiveMember"> Thành viên tích cực</label>
+        </div>
+      </form>
+
+      <div class="card result">
+        <h2><span class="step">2</span> Xác suất rời bỏ</h2>
+        <div id="chOut" class="prob3"><p class="muted">Đang tải mô hình…</p></div>
+        <div id="chAlert"></div>
+      </div>
+    </div>
+
+    <div class="grid2 mt">
+      <div class="card">
+        <h2><span class="step">3</span> Mô hình đọc hồ sơ từng bước</h2>
+        <div class="seg" id="traceSel" role="group" aria-label="Chọn mô hình">
+          <button type="button" data-cell="rnn">RNN</button><button type="button" data-cell="lstm">LSTM</button><button type="button" data-cell="gru" class="on">GRU</button>
+        </div>
+        <div class="chart-box"><canvas id="traceChart" aria-label="Xác suất tạm thời theo bước"></canvas></div>
+        <p class="note muted">Đường cho thấy giá trị σ(lớp đầu ra áp lên h<sub>t</sub>) nếu mô hình dừng đọc ở bước t. Lớp đầu ra chỉ
+          được huấn luyện trên h<sub>11</sub>, nên các bước giữa chỉ có ý nghĩa minh hoạ. Cột xám là mức cổng trung bình
+          (LSTM: cổng quên f<sub>t</sub>; GRU: cổng cập nhật z<sub>t</sub>, giá trị cao nghĩa là giữ lại trạng thái cũ).</p>
+      </div>
+      <div class="card">
+        <h2><span class="step">4</span> Thử thay đổi: tuổi và số sản phẩm</h2>
+        <div class="chart-box"><canvas id="whatIfChart" aria-label="Xác suất theo tuổi"></canvas></div>
+        <div class="chart-box short"><canvas id="prodChart" aria-label="Xác suất theo số sản phẩm"></canvas></div>
+        <p class="note muted">Các cột khác giữ nguyên như hồ sơ đang nhập. Đây là hai đặc trưng quan trọng nhất (Hình 4.3b
+          trong báo cáo). Quan hệ với cả hai đều phi tuyến: rủi ro đạt đỉnh quanh 50–60 tuổi và tăng vọt khi có 3–4 sản phẩm.</p>
+      </div>
+    </div>
+
+    <div class="grid2 mt">
+      <div class="card">
+        <h2>Độ quan trọng hoán vị (test)</h2>
+        <div class="chart-box"><canvas id="impChart" aria-label="Độ quan trọng hoán vị"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Thẻ mô hình</h2>
+        <div id="chCard"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="wrap foot muted">
+    Dữ liệu: <a href="https://www.kaggle.com/datasets/shrutimechlearn/churn-modelling" target="_blank" rel="noopener">Churn Modelling (Kaggle)</a>
+    — suy luận: <code>rnn.js</code> · biểu đồ: Chart.js
+  </footer>
+
+  <script src="rnn.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

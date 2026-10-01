@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RNN Lab — Assignment 06</title>
+  <meta name="description" content="RNN, LSTM, GRU trên Churn Modelling và giá cổ phiếu Amazon — suy luận 100% trong trình duyệt bằng JavaScript thuần.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Cpath d='M7 20c3-9 6-9 9 0s6 9 9 0' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="index">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>RNN Lab <span class="muted">· Assignment 06</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html" aria-current="page">Trang chủ <small>tổng quan</small></a>
+      <a href="churn.html">Churn <small>khách hàng rời bỏ</small></a>
+      <a href="amzn.html">AMZN <small>lợi suất · biến động</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h2>Mạng hồi quy trên hai bộ dữ liệu Kaggle, chạy ngay trong trình duyệt</h2>
+      <p class="muted">Các mô hình RNN, LSTM, GRU được huấn luyện bằng PyTorch trên GPU laptop rồi xuất trọng số ra JSON.
+        Trang này chỉ gồm file tĩnh. Phép tính của từng cổng LSTM/GRU được viết lại bằng JavaScript thuần
+        (<code>rnn.js</code>, khoảng 100 dòng) theo đúng công thức trong báo cáo, không dùng thư viện học sâu.</p>
+    </section>
+
+    <div class="cards">
+      <a class="card ds-card" href="churn.html">
+        <span class="ds-tag">Phân lớp · many-to-one</span>
+        <h3>Churn Modelling</h3>
+        <p class="muted">10.000 khách hàng ngân hàng. Mỗi khách hàng là một chuỗi 11 bước, mỗi bước là một đặc trưng.
+          Mô hình trả về xác suất khách rời bỏ ngân hàng.</p>
+        <p class="ds-num"><b id="kChurn">—</b><span class="muted">ROC-AUC test (GRU)</span></p>
+        <span class="ds-go">Mở trang →</span>
+      </a>
+      <a class="card ds-card" href="amzn.html">
+        <span class="ds-tag">Hồi quy chuỗi thời gian</span>
+        <h3>Giá cổ phiếu Amazon</h3>
+        <p class="muted">6.257 phiên (1997–2022). Mô hình đọc 60 phiên × 4 đặc trưng để dự báo lợi suất phiên sau và biến động
+          5 phiên tới, rồi ghép thành khoảng dự báo giá.</p>
+        <p class="ds-num"><b id="kAmzn">—</b><span class="muted">khoảng 95% cho phiên 25/03/2022</span></p>
+        <span class="ds-go">Mở trang →</span>
+      </a>
+      <div class="card ds-card">
+        <span class="ds-tag">Tự kiểm chứng</span>
+        <h3>JavaScript ↔ PyTorch</h3>
+        <p class="muted">Chạy lại mọi mẫu tham chiếu (40 khách hàng × 3 mô hình, mọi ngày trong giai đoạn test × 2 mô hình)
+          và so với giá trị Python đã ghi sẵn.</p>
+        <button class="btn" id="selfTestBtn" type="button">Chạy kiểm chứng</button>
+        <pre class="mono" id="selfTestOut" hidden></pre>
+      </div>
+    </div>
+
+    <section class="card about">
+      <h2>Hệ thống thông minh: từ dữ liệu đến quyết định</h2>
+      <div class="prose">
+        <div class="flow">
+          <span class="node">Môi trường<small>khách hàng / thị trường</small></span><span class="edge">quan sát</span>
+          <span class="node">Đầu vào<small>hồ sơ 11 cột / giá OHLCV</small></span><span class="edge">biểu diễn</span>
+          <span class="node accent">Chuỗi x₁…x_T<small>T=11, D=12 / T=60, D=4</small></span><span class="edge">RNN</span>
+          <span class="node accent">Trạng thái h_T<small>bộ nhớ đã nén</small></span><span class="edge">Linear</span>
+          <span class="node">Đầu ra<small>P(rời bỏ) / μ̂, σ̂</small></span><span class="edge">quyết định</span>
+          <span class="node">Hành động<small>giữ chân KH / khoảng rủi ro</small></span>
+        </div>
+        <ul>
+          <li><b>Churn:</b> hệ thống báo những khách hàng có xác suất rời bỏ vượt ngưỡng (ngưỡng tối ưu F1, chọn trên tập val)
+            để bộ phận chăm sóc ưu tiên liên hệ. Dữ liệu này không có trục thời gian. Báo cáo (mục 4.3) cho thấy RNN
+            dùng được nhưng không vượt mô hình cây, và trình bày lý do.</li>
+          <li><b>AMZN:</b> lợi suất ngày gần như không dự báo được (R² ≈ 0), còn biến động thì dự báo được.
+            Hệ thống vì vậy không đưa ra một "giá ngày mai" duy nhất mà đưa ra một <b>khoảng</b> giá kèm mức tin cậy.
+            Khoảng này đã được kiểm tra độ phủ trên dữ liệu chưa từng thấy.</li>
+          <li>Không có máy chủ suy luận. Dữ liệu bạn nhập không rời khỏi trình duyệt.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot muted">
+    Dữ liệu: <a href="https://www.kaggle.com/datasets/shrutimechlearn/churn-modelling" target="_blank" rel="noopener">Churn Modelling</a> ·
+    <a href="https://www.kaggle.com/datasets/varpit94/amazon-stock-data" target="_blank" rel="noopener">Amazon Stock Data</a>
+    — suy luận: <code>rnn.js</code> (JavaScript thuần)
+  </footer>
+
+  <script src="rnn.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>
