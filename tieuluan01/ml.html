@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiểu luận AI — Học máy cơ bản</title>
+  <meta name="description" content="Chương 2: hồi quy tuyến tính, logistic, softmax và MLP trên Pima, California Housing, Dry Bean — NumPy, Keras, PyTorch.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M9 16L23 9M9 16L23 23' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="ml">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Tiểu luận AI <span class="muted">· Chương 2</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Chương 1 <small>lịch sử AI</small></a>
+      <a href="ml.html" aria-current="page">Chương 2 <small>học máy cơ bản</small></a>
+      <a href="cnn.html">Chương 3 <small>CNN</small></a>
+      <a href="rnn.html">Chương 4 <small>RNN · LSTM</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro"><p>Chọn một tập dữ liệu, nhập số liệu (hoặc nạp một mẫu test có sẵn) rồi bấm <b>Dự đoán</b>.
+      Sáu mô hình trả lời cùng lúc: mô hình <b>tuyến tính</b> và <b>MLP</b> 64-32, mỗi loại do NumPy, Keras và PyTorch
+      huấn luyện. Dữ liệu được chuẩn hoá bằng trung bình/độ lệch chuẩn của tập train, giống lúc huấn luyện.</p></div>
+    <div class="seg" id="dsSeg" role="tablist">
+      <button type="button" class="on" data-ds="Pima">Pima — tiểu đường</button>
+      <button type="button" data-ds="California">California — giá nhà</button>
+      <button type="button" data-ds="Dry Bean">Dry Bean — giống đậu</button>
+    </div>
+    <div class="grid2">
+      <section class="card">
+        <h2><span class="step">1</span> Đặc trưng đầu vào</h2>
+        <p class="label">Nạp mẫu test (nhãn thật ghi trong ngoặc)</p>
+        <div class="chips" id="sampleChips"></div>
+        <div class="form-grid" id="mlForm"></div>
+        <button class="btn mt" id="mlRun" type="button">Dự đoán</button>
+      </section>
+      <section class="card result">
+        <h2><span class="step">2</span> Sáu mô hình trả lời</h2>
+        <div id="mlOut"><p class="placeholder muted">Đang nạp mô hình…</p></div>
+        <p class="meta muted" id="mlMeta"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap foot muted">
+    Dữ liệu: <a href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database" target="_blank" rel="noopener">Pima Indians Diabetes</a> ·
+    <a href="https://www.dcc.fc.up.pt/~ltorgo/Regression/cal_housing.html" target="_blank" rel="noopener">California Housing</a> ·
+    <a href="https://archive.ics.uci.edu/dataset/602/dry+bean+dataset" target="_blank" rel="noopener">Dry Bean</a>
+    — suy luận: <code>nn.js</code>
+  </footer>
+  <script src="nn.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

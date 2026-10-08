@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Intelligent System Lab — Đinh Hải Triều</title>
-  <meta name="description" content="Tổng hợp các web demo serverless của môn Intelligent System Development (Assignment 01–06): học máy, MLP, CNN, RNN chạy hoàn toàn trong trình duyệt.">
+  <meta name="description" content="Tổng hợp các web demo serverless của môn Intelligent System Development (Assignment 01–06 và tiểu luận): học máy, MLP, CNN, RNN chạy hoàn toàn trong trình duyệt.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='10' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='22' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='22' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M10 16L22 9M10 16L22 23' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
       <a class="brand" href="./">
         <span class="logo" aria-hidden="true"></span>
         <div>
-          <h1>Intelligent System Lab <span class="muted">· Assignment 01–06</span></h1>
+          <h1>Intelligent System Lab <span class="muted">· Assignment 01–06 · Tiểu luận</span></h1>
           <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
         </div>
       </a>
@@ -27,7 +27,7 @@
 
   <main class="wrap">
     <section class="hero">
-      <h2>Sáu bài tập, một hệ thống: dữ liệu → biểu diễn → mô hình → quyết định</h2>
+      <h2>Sáu bài tập và một tiểu luận, một hệ thống: dữ liệu → biểu diễn → mô hình → quyết định</h2>
       <p class="muted">Mọi mô hình đều được huấn luyện bằng Python rồi xuất trọng số ra file tĩnh (JSON / ONNX).
         Trang web không có máy chủ suy luận: trình duyệt của bạn tự tải trọng số và tính toán, nên dữ liệu bạn nhập
         không rời khỏi máy.</p>
@@ -40,11 +40,20 @@
       <span class="tl"><b>A04</b> CNN cơ bản</span>
       <span class="tl"><b>A05</b> kiến trúc CNN cải tiến</span>
       <span class="tl"><b>A06</b> RNN · LSTM · GRU</span>
+      <span class="tl"><b>Tiểu luận</b> lịch sử AI → RNN, NumPy · Keras · PyTorch</span>
     </div>
 
     <div class="cards hub-cards">
+      <a class="card ds-card" href="tieuluan01/">
+        <span class="ds-tag">Tiểu luận · mới nhất</span>
+        <h3>Từ perceptron đến LSTM: một mô hình, ba cách cài đặt</h3>
+        <p class="muted">Lịch sử AI qua dữ liệu Epoch AI, học máy cơ bản, CNN và RNN trên 9 tập dữ liệu. Mỗi mô hình được
+          huấn luyện bằng NumPy viết từ đầu, Keras và PyTorch; cả ba chạy lại trong trình duyệt bằng nn.js.</p>
+        <p class="chips-row"><span>Pima · California · Dry Bean</span><span>Fashion · CIFAR-10 · Flowers</span><span>IMDB · Jena · Shakespeare</span></p>
+        <span class="ds-go">Mở →</span>
+      </a>
       <a class="card ds-card" href="a06-rnn/">
-        <span class="ds-tag">Assignment 06 · mới nhất</span>
+        <span class="ds-tag">Assignment 06</span>
         <h3>RNN Lab: Churn &amp; giá cổ phiếu Amazon</h3>
         <p class="muted">RNN, LSTM, GRU (PyTorch và Keras) với phép tính từng cổng viết lại bằng JavaScript thuần.
           Dự đoán khách hàng rời ngân hàng, dự báo lợi suất và biến động AMZN, khoảng giá cho phiên kế tiếp.</p>

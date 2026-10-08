@@ -6,7 +6,8 @@
     { "source": "/a01-gia-nha", "destination": "/a01-gia-nha/", "permanent": false },
     { "source": "/a02-recommend", "destination": "/a02-recommend/", "permanent": false },
     { "source": "/a05-cnn", "destination": "/a05-cnn/", "permanent": false },
-    { "source": "/a06-rnn", "destination": "/a06-rnn/", "permanent": false }
+    { "source": "/a06-rnn", "destination": "/a06-rnn/", "permanent": false },
+    { "source": "/tieuluan01", "destination": "/tieuluan01/", "permanent": false }
   ],
   "headers": [
     {

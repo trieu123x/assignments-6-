@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiểu luận AI — CNN</title>
+  <meta name="description" content="Chương 3: cùng một CNN do NumPy, Keras, PyTorch huấn luyện, phân loại ảnh Fashion-MNIST, CIFAR-10, Flowers ngay trong trình duyệt.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M9 16L23 9M9 16L23 23' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="cnn">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Tiểu luận AI <span class="muted">· Chương 3</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Chương 1 <small>lịch sử AI</small></a>
+      <a href="ml.html">Chương 2 <small>học máy cơ bản</small></a>
+      <a href="cnn.html" aria-current="page">Chương 3 <small>CNN</small></a>
+      <a href="rnn.html">Chương 4 <small>RNN · LSTM</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro"><p>Cùng một kiến trúc CNN (2–3 khối Conv 3×3 → ReLU → MaxPool, rồi Dense) được huấn luyện ba lần:
+      bằng NumPy trên CPU, bằng Keras và bằng PyTorch trên GPU. Chọn ảnh mẫu từ tập test hoặc tải ảnh của bạn,
+      cả ba mô hình sẽ phân loại ảnh đó bằng <code>nn.js</code>.</p></div>
+    <div class="seg" id="dsSeg">
+      <button type="button" class="on" data-ds="fashionmnist">Fashion-MNIST</button>
+      <button type="button" data-ds="cifar10">CIFAR-10</button>
+      <button type="button" data-ds="flowers">Flowers</button>
+    </div>
+    <div class="grid3">
+      <section class="card">
+        <h2><span class="step">1</span> Chọn ảnh</h2>
+        <label class="drop" id="drop" tabindex="0">
+          <span class="drop-ico">⬆</span><b>Tải ảnh lên</b><span class="muted">bấm, kéo-thả hoặc dán (Ctrl+V)</span>
+          <input type="file" id="file" accept="image/*" hidden>
+        </label>
+        <label class="check-row"><input type="checkbox" id="invert"> Đảo màu (Fashion-MNIST là vật sáng trên nền đen)</label>
+        <p class="label">Ảnh test có sẵn (4 ảnh mỗi lớp)</p>
+        <div class="samples" id="samples"></div>
+      </section>
+      <section class="card">
+        <h2><span class="step">2</span> Ảnh mô hình thấy</h2>
+        <div class="seen">
+          <figure><canvas id="cvIn" class="input" width="64" height="64"></canvas><figcaption id="cvCap">đầu vào</figcaption></figure>
+        </div>
+        <div id="cnnInfo" class="muted small-txt"></div>
+      </section>
+      <section class="card result">
+        <h2><span class="step">3</span> Ba mô hình phân loại</h2>
+        <div id="cnnOut"><p class="placeholder muted">Đang nạp mô hình…</p></div>
+        <p class="meta muted" id="cnnMeta"></p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap foot muted">
+    Dữ liệu: <a href="https://github.com/zalandoresearch/fashion-mnist" target="_blank" rel="noopener">Fashion-MNIST</a> ·
+    <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-10</a> ·
+    <a href="https://www.kaggle.com/datasets/alxmamaev/flowers-recognition" target="_blank" rel="noopener">Flowers Recognition</a>
+    — suy luận: <code>nn.js</code>
+  </footer>
+  <script src="nn.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

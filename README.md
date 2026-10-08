@@ -1,4 +1,4 @@
-# Intelligent System Lab — Assignment 01 → 06
+# Intelligent System Lab — Assignment 01 → 06 và tiểu luận
 
 **Đinh Hải Triều — B23DCCN843 — Lớp 06** · Intelligent System Development · TS. Trần Đình Quế
 
@@ -9,6 +9,7 @@ tự tính toán.
 | Đường dẫn | Bài | Nội dung | Suy luận trong trình duyệt |
 |---|---|---|---|
 | `/` | — | trang hub | — |
+| `/tieuluan01/` | Tiểu luận | lịch sử AI (Epoch AI, MNIST), học máy cơ bản, CNN, RNN — mỗi mô hình cài bằng NumPy, Keras, PyTorch; 9 tập dữ liệu | `nn.js` (JavaScript thuần: Dense, Conv2D, LSTM, GRU) |
 | `/a06-rnn/` | A06 | RNN, LSTM, GRU: Churn Modelling, giá cổ phiếu Amazon | `rnn.js` (JavaScript thuần, viết từ công thức) |
 | `/a05-cnn/` | A05 | LeNet-5, AlexNet, VGG-16, ResNet-50: CIFAR-10, Flowers; CNN-1D: Diabetes | ONNX Runtime Web (WASM), 10 mô hình int8 |
 | `/a02-recommend/` | A02 (+A03, A04) | review thương mại điện tử: LogReg TF-IDF, MLP, Text-CNN | JavaScript (React/Vite) |
@@ -28,11 +29,11 @@ hướng sang `/a05-cnn/` để đường dẫn tương đối không bị lệc
 
 ## Dựng lại
 
-Site được sinh tự động từ mã nguồn của từng tuần bằng `tuan 6/lib/build_hub.py`. Script
+Site được sinh tự động từ mã nguồn của từng tuần bằng `tuan 7/lib/build_hub.py`. Script
 sao chép, build lại ứng dụng Vite với `--base ./`, sửa liên kết, và chèn nút "← Tất cả bài tập"
 vào mỗi trang:
 
 ```bash
-py -3.11 "tuan 6/lib/build_hub.py" assignments-hub
+py -3.11 "tuan 7/lib/build_hub.py" assignments-hub
 node "tuan 6/lib/check_hub.mjs" assignments-hub     # kiểm thử mọi trang trong Edge headless
 ```
