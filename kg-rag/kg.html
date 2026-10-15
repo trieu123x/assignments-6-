@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phòng thí nghiệm KG</title>
+  <meta name="description" content="Duyệt ba đồ thị tri thức và dự đoán liên kết bằng TransE, DistMult, ComplEx ngay trong trình duyệt.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='9' cy='10' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='16' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M9 10L23 9L16 23Z' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body data-page="kg">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Knowledge Graph &amp; RAG <span class="muted">· Chương 4</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Tổng quan <small>4.1 · lịch sử, kết quả</small></a>
+      <a href="kg.html" aria-current="page">Phòng thí nghiệm KG <small>4.2 · TransE · DistMult · ComplEx</small></a>
+      <a href="tieuduong.html">Tiểu đường <small>4.4 · Hetionet + MedQuAD</small></a>
+      <a href="chungkhoan.html">Chứng khoán &amp; vàng <small>4.5 · S&amp;P 500 + Wikipedia</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro"><p>Chọn đồ thị và mô hình nhúng, tìm một thực thể, rồi hỏi mô hình "(thực thể, quan hệ, ?)". Điểm được tính
+      lại bằng <code>core.js</code> trên nhúng float16 của bản PyTorch — đúng hàm điểm đã dùng khi huấn luyện.</p></div>
+
+    <div class="ctrl-row card">
+      <label>Đồ thị
+        <select id="dsSel">
+          <option value="hetio_dm">Hetionet-DM (tiểu đường)</option>
+          <option value="sp500">SP500-KG (chứng khoán + vàng)</option>
+          <option value="codex">CoDEx-S (Wikidata)</option>
+        </select>
+      </label>
+      <div><span class="muted" style="font-size:.8rem;font-weight:600">Mô hình</span><br>
+        <div class="seg" id="kindSeg" role="group" aria-label="Mô hình nhúng">
+          <button type="button" data-k="transe">TransE</button><button type="button" data-k="distmult">DistMult</button><button type="button" data-k="complex" class="on">ComplEx</button>
+        </div>
+      </div>
+      <label class="grow">Thực thể
+        <input class="inp" id="entInp" placeholder="gõ tên, ví dụ: Metformin, Nvidia, Paris…" autocomplete="off">
+        <ul class="sugg" id="sugg"></ul>
+      </label>
+      <span class="muted" id="dsInfo" style="font-size:.8rem"></span>
+    </div>
+
+    <div class="grid2">
+      <section class="card">
+        <h2><span class="step">1</span><span id="gTitle">Lân cận</span></h2>
+        <canvas class="graph" id="graph" aria-label="Đồ thị lân cận của thực thể"></canvas>
+        <div class="legend" id="legend"></div>
+        <p class="note muted">Bấm vào một nút để chuyển tâm. Tối đa 6 cạnh mỗi quan hệ để hình dễ đọc.</p>
+      </section>
+      <section class="card">
+        <h2><span class="step">2</span>Dự đoán liên kết</h2>
+        <label class="label" for="relSel">Quan hệ (h, r, ?) hoặc chiều ngược (?, r, h)</label>
+        <select id="relSel"></select>
+        <p class="label" id="predHead"></p>
+        <ol class="pred" id="pred"></ol>
+        <p class="note muted"><span class="badge known">đã có</span> = bộ ba có trong đồ thị (train/valid/test);
+          <span class="badge new">mới</span> = mô hình gợi ý, cần kiểm chứng.</p>
+      </section>
+    </div>
+
+    <section class="card mt">
+      <h2><span class="step">3</span>Kết quả trên tập test của đồ thị này (MRR có lọc · Hits@10)</h2>
+      <div class="grid2">
+        <div class="tbl-wrap" id="metricTbl"></div>
+        <div class="chart-box"><canvas id="mrrChart" aria-label="MRR theo mô hình và nền tảng"></canvas></div>
+      </div>
+      <details class="extra"><summary>Tự kiểm: core.js so với Python</summary><pre class="mono" id="selfTest">…</pre></details>
+    </section>
+    <p class="foot muted">Dữ liệu: CoDEx (Safavi &amp; Koutra 2020), Hetionet v1.0 (Himmelstein &amp; cs. 2017), SP500-KG tự dựng từ Wikidata + GICS + Yahoo Finance.</p>
+  </main>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

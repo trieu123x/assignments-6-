@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chứng khoán và vàng</title>
+  <meta name="description" content="KG + RAG cho cổ phiếu S&P 500 và vàng: Wikidata, ngành GICS, tương quan giá, Wikipedia; so sánh 4 chế độ trả lời.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='9' cy='10' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='16' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M9 10L23 9L16 23Z' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body data-page="rag" data-domain="sp">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Knowledge Graph &amp; RAG <span class="muted">· Chương 4</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html">Tổng quan <small>4.1 · lịch sử, kết quả</small></a>
+      <a href="kg.html">Phòng thí nghiệm KG <small>4.2 · TransE · DistMult · ComplEx</small></a>
+      <a href="tieuduong.html">Tiểu đường <small>4.4 · Hetionet + MedQuAD</small></a>
+      <a href="chungkhoan.html" aria-current="page">Chứng khoán &amp; vàng <small>4.5 · S&amp;P 500 + Wikipedia</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="intro"><p>Hỏi bằng tiếng Anh về các công ty S&amp;P 500 hoặc vàng (mã cổ phiếu viết HOA, ví dụ NVDA). Đồ thị
+      <b>SP500-KG</b> chứa quan hệ Wikidata, ngành GICS và các cạnh sinh từ giá 2 năm (đồng biến, cùng/ngược chiều vàng, mức beta);
+      kho văn bản là đoạn mở đầu Wikipedia của 448 công ty.</p>
+      <p class="note warn alert">Số liệu giá chỉ để minh hoạ phương pháp, không phải khuyến nghị đầu tư.</p></div>
+    <div id="ragApp"></div>
+    <section class="card mt">
+      <h2><span class="step">★</span>Cổ phiếu và vàng: tương quan lợi suất ngày 2 năm</h2>
+      <div class="grid2">
+        <div class="chart-box tall"><canvas id="goldChart" aria-label="Tương quan với vàng theo ngành"></canvas></div>
+        <div class="tbl-wrap" id="goldTbl"></div>
+      </div>
+    </section>
+  </main>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

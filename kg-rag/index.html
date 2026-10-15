@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Knowledge Graph và RAG</title>
+  <meta name="description" content="Chương 4: Knowledge Graph và RAG — nhúng đồ thị TransE/DistMult/ComplEx bằng NumPy, Keras, PyTorch; truy hồi BM25 + bộ mã hoá kép; hỏi–đáp tiểu đường và chứng khoán.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bd3'/%3E%3Ccircle cx='9' cy='10' r='3' fill='%23fff'/%3E%3Ccircle cx='23' cy='9' r='3' fill='%23fff'/%3E%3Ccircle cx='16' cy='23' r='3' fill='%23fff'/%3E%3Cpath d='M9 10L23 9L16 23Z' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body data-page="index">
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>Knowledge Graph &amp; RAG <span class="muted">· Chương 4</span></h1>
+          <p class="sub">Đinh Hải Triều · B23DCCN843 · Lớp 06 — Intelligent System Development, TS. Trần Đình Quế</p>
+        </div>
+      </a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Đổi giao diện sáng/tối">◐</button>
+    </div>
+    <nav class="wrap tabs" aria-label="Các trang">
+      <a href="index.html" aria-current="page">Tổng quan <small>4.1 · lịch sử, kết quả</small></a>
+      <a href="kg.html">Phòng thí nghiệm KG <small>4.2 · TransE · DistMult · ComplEx</small></a>
+      <a href="tieuduong.html">Tiểu đường <small>4.4 · Hetionet + MedQuAD</small></a>
+      <a href="chungkhoan.html">Chứng khoán &amp; vàng <small>4.5 · S&amp;P 500 + Wikipedia</small></a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h2>LLM biết nói nhưng không biết hết. Đồ thị tri thức và RAG đưa sự thật vào lúc trả lời.</h2>
+      <p class="muted">Trang này chạy hoàn toàn trong trình duyệt: nhúng đồ thị (TransE, DistMult, ComplEx), BM25, bộ mã hoá kép,
+        liên kết thực thể và truy hồi bộ ba đều được viết lại bằng JavaScript và đối chiếu số với bản Python. Câu trả lời
+        của LLM (Qwen2.5-1.5B-Instruct, chạy trên GPU RTX 3060) được tính sẵn cho các câu hỏi đánh giá.</p>
+    </section>
+
+    <div class="kpis" id="kpis"></div>
+
+    <section class="card mt">
+      <h2><span class="step">1</span>Một câu hỏi đi qua hệ thống như thế nào</h2>
+      <div class="flow">
+        <span class="node">Câu hỏi<small>"Which drugs treat type 2 diabetes?"</small></span><span class="edge">liên kết thực thể</span>
+        <span class="node accent">Đồ thị tri thức<small>bộ ba quanh thực thể, xếp theo quan hệ</small></span>
+        <span class="edge">+</span>
+        <span class="node accent">Kho văn bản<small>BM25 + bộ mã hoá kép, gộp RRF</small></span><span class="edge">ghép</span>
+        <span class="node">Prompt<small>ngữ cảnh + câu hỏi</small></span><span class="edge">sinh</span>
+        <span class="node">LLM<small>Qwen2.5-1.5B</small></span><span class="edge">kiểm tra</span>
+        <span class="node">Câu trả lời<small>chấm với đáp án</small></span>
+      </div>
+      <p class="note muted">Chế độ so sánh: <b>Chỉ LLM</b> (tri thức trong trọng số) · <b>RAG văn bản</b> · <b>RAG đồ thị</b> · <b>RAG lai</b>.</p>
+    </section>
+
+    <div class="grid2 mt">
+      <section class="card">
+        <h2><span class="step">2</span>Số công bố khoa học mỗi năm (OpenAlex)</h2>
+        <div class="chart-box tall"><canvas id="oaChart" aria-label="Biểu đồ số công bố theo năm"></canvas></div>
+        <p class="note muted">Thang log. "Knowledge graph" tăng ~280 lần từ 2012 (Google Knowledge Graph) đến 2025; "RAG" bùng nổ sau ChatGPT (2022).</p>
+      </section>
+      <section class="card">
+        <h2><span class="step">3</span>Các mốc chính</h2>
+        <ul class="timeline-v">
+          <li><b>1968–1976</b>Mạng ngữ nghĩa (Quillian), hệ chuyên gia MYCIN: tri thức viết tay dưới dạng luật và nút–cạnh.</li>
+          <li><b>1984</b>Cyc — dự án gom tri thức thường thức thủ công lớn nhất.</li>
+          <li><b>1998–2001</b>RDF, "The Semantic Web" (Berners-Lee); 2004 OWL; 2008 SPARQL.</li>
+          <li><b>2007–2012</b>DBpedia, YAGO, Freebase, Wikidata; Google Knowledge Graph "things, not strings".</li>
+          <li><b>2013–2016</b>Nhúng đồ thị: TransE, DistMult, ComplEx; Hetionet (2017) cho tái định vị thuốc.</li>
+          <li><b>2017–2020</b>Transformer, BERT; DPR (truy hồi dày); RAG (Lewis &amp; cs., 2020); REALM.</li>
+          <li><b>2022–2024</b>ChatGPT, ảo giác của LLM → RAG thành chuẩn công nghiệp; GraphRAG (Microsoft, 2024).</li>
+        </ul>
+      </section>
+    </div>
+
+    <h2 class="mt" style="font-size:1.05rem">Ba trang thực nghiệm</h2>
+    <div class="cards">
+      <a class="card ds-card" href="kg.html">
+        <span class="ds-tag">4.2 · Knowledge Graph</span>
+        <h3>Phòng thí nghiệm nhúng đồ thị</h3>
+        <p class="muted">Duyệt CoDEx-S, Hetionet-DM, SP500-KG; vẽ lân cận; dự đoán liên kết bằng TransE / DistMult / ComplEx
+          (bản PyTorch), so với kết quả của cả 3 nền tảng.</p>
+        <p class="ds-num" id="kgNum"></p>
+        <span class="ds-go">Mở →</span>
+      </a>
+      <a class="card ds-card" href="tieuduong.html">
+        <span class="ds-tag">4.4 · Y tế</span>
+        <h3>Hỏi–đáp bệnh tiểu đường</h3>
+        <p class="muted">Hetionet (thuốc, gen, triệu chứng…) + câu trả lời của NIH (MedQuAD). Xem ngữ cảnh được truy hồi và
+          câu trả lời của LLM ở 4 chế độ.</p>
+        <p class="ds-num" id="dmNum"></p>
+        <span class="ds-go">Mở →</span>
+      </a>
+      <a class="card ds-card" href="chungkhoan.html">
+        <span class="ds-tag">4.5 · Tài chính</span>
+        <h3>Chứng khoán S&amp;P 500 và vàng</h3>
+        <p class="muted">Đồ thị tự dựng từ Wikidata + ngành GICS + tương quan giá 2 năm; Wikipedia làm kho văn bản. LLM không
+          thể biết số liệu 2026 — RAG đưa chúng vào.</p>
+        <p class="ds-num" id="spNum"></p>
+        <span class="ds-go">Mở →</span>
+      </a>
+    </div>
+
+    <section class="card">
+      <h2><span class="step">4</span>Kết quả chính</h2>
+      <div class="tbl-wrap" id="mainTables"></div>
+    </section>
+    <p class="foot muted">Mã nguồn: notebooks <code>nb1_du_lieu</code> … <code>nb5_chung_khoan</code>; web: <code>core.js</code> (thuật toán), <code>app.js</code> (giao diện).</p>
+  </main>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+<a href="../" style="position:fixed;left:12px;bottom:12px;z-index:9999;padding:7px 12px;border-radius:99px;background:#2f5bd3;color:#fff;font:600 13px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.25)">← Tất cả bài tập</a>
+</body>
+</html>

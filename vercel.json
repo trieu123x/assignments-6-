@@ -7,7 +7,8 @@
     { "source": "/a02-recommend", "destination": "/a02-recommend/", "permanent": false },
     { "source": "/a05-cnn", "destination": "/a05-cnn/", "permanent": false },
     { "source": "/a06-rnn", "destination": "/a06-rnn/", "permanent": false },
-    { "source": "/tieuluan01", "destination": "/tieuluan01/", "permanent": false }
+    { "source": "/tieuluan01", "destination": "/tieuluan01/", "permanent": false },
+    { "source": "/kg-rag", "destination": "/kg-rag/", "permanent": false }
   ],
   "headers": [
     {
